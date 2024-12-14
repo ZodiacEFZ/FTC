@@ -4,8 +4,12 @@ import java.text.SimpleDateFormat
 // build.gradle in FtcRobotController
 //
 apply plugin: 'com.android.library'
+apply from: '../build.dependencies.gradle'
 
 android {
+    namespace = 'com.qualcomm.ftcrobotcontroller'
+
+    compileSdk 34
 
     defaultConfig {
         minSdkVersion 24
@@ -17,14 +21,4 @@ android {
     buildFeatures {
         buildConfig = true
     }
-
-    compileSdkVersion 30
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    namespace = 'com.qualcomm.ftcrobotcontroller'
 }
-
-apply from: '../build.dependencies.gradle'
