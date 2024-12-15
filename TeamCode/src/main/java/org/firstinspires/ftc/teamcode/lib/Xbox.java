@@ -15,6 +15,14 @@ public class Xbox extends GamepadEx {
         super(gamepad);
     }
 
+    public void rumble() {
+        rumble(0.5, 0.5);
+    }
+
+    public void rumble(double power, double seconds) {
+        gamepad.rumble(power, power, (int) (seconds * 1000));
+    }
+
     public Xbox onPressed(Button button, Runnable func) {
         Set<Runnable> runnables = onPressedActions.get(button);
         if (runnables == null) {
