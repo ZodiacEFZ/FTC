@@ -16,12 +16,11 @@ public class MecanumOpMode extends OpMode {
     private final ElapsedTime timer = new ElapsedTime();
     private final Translation2d size = new Translation2d(0.1675, 0.2075);
     private Mecanum chassis;
-    private REVIMU imu;
     private Xbox driver;
 
     @Override
     public void init() {
-        imu = new REVIMU(hardwareMap);
+        REVIMU imu = new REVIMU(hardwareMap);
 
         chassis = new Mecanum(hardwareMap, size, "frontLeft", "frontRight", "rearLeft", "rearRight",
                 Motor.GoBILDA.RPM_312, imu);
@@ -46,8 +45,6 @@ public class MecanumOpMode extends OpMode {
 
     @Override
     public void loop() {
-        driver.execute();
-
         chassis.drive(-driver.getLeftX(), driver.getLeftY(), -driver.getRightX());
 
         telemetry.addData("Time", timer);

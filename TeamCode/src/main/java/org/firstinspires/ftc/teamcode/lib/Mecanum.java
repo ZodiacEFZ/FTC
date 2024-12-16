@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.lib;
 
-import androidx.annotation.NonNull;
-
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
@@ -15,13 +14,12 @@ import com.arcrobotics.ftclib.kinematics.wpilibkinematics.MecanumDriveWheelSpeed
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class Mecanum {
+public class Mecanum extends SubsystemBase {
     private final ElapsedTime timer = new ElapsedTime();
     private final MotorEx frontLeft, frontRight, rearLeft, rearRight;
     private final GyroEx imu;
     private final MecanumDrive drive;
     private final MecanumDriveOdometry odometry;
-    private final MecanumDriveKinematics kinematics;
     private boolean headless = false;
     private MecanumDriveWheelSpeeds wheelSpeeds;
     private Pose2d pose;
@@ -34,17 +32,25 @@ public class Mecanum {
         rearRight = new MotorEx(hardwareMap, rearRightMotorName, goBILDA);
         this.imu = imu;
         drive = new MecanumDrive(frontLeft, frontRight, rearLeft, rearRight);
-        kinematics = new MecanumDriveKinematics(new Translation2d(size.getX(), size.getY()), new Translation2d(size.getX(), -size.getY()),
-                new Translation2d(-size.getX(), size.getY()), new Translation2d(-size.getX(), -size.getY()));
-        odometry = new MecanumDriveOdometry(kinematics, imu == null ? new Rotation2d() : imu.getRotation2d(), new Pose2d());
+        MecanumDriveKinematics kinematics = new MecanumDriveKinematics(
+                new Translation2d(size.getX(), size.getY()),
+                new Translation2d(size.getX(), -size.getY()),
+                new Translation2d(-size.getX(), size.getY()),
+                new Translation2d(-size.getX(), -size.getY()));
+        odometry = new MecanumDriveOdometry(kinematics,
+                imu == null ? new Rotation2d() : imu.getRotation2d(), new Pose2d());
+    }
+
+    @Override
+    public void periodic() {
+        wheelSpeeds = new MecanumDriveWheelSpeeds(frontLeft.getVelocity(), frontRight.getVelocity(),
+                rearLeft.getVelocity(), rearRight.getVelocity());
+        pose = odometry.updateWithTime(timer.seconds(), new Rotation2d(), wheelSpeeds);
     }
 
     public void drive(double strafe, double forward, double omega) {
         drive.driveFieldCentric(strafe, forward, omega,
                 headless ? imu.getRotation2d().getDegrees() : 0);
-        wheelSpeeds = new MecanumDriveWheelSpeeds(frontLeft.getVelocity(), frontRight.getVelocity(),
-                rearLeft.getVelocity(), rearRight.getVelocity());
-        pose = odometry.updateWithTime(timer.seconds(), new Rotation2d(), wheelSpeeds);
     }
 
     public boolean toggleHeadless() {
